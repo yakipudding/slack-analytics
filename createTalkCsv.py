@@ -9,9 +9,9 @@ channels = pd.read_csv('output/channels.csv', encoding='utf_8_sig')['name']
 
 talk_cols = ['client_msg_id', 'ts', 'thread_ts', 'user','text','date']
 # talk/reactions/users
-reaction_cols = ['client_msg_id','talk_user','user','name']
+reaction_cols = ['client_msg_id', 'ts','talk_user','user','emoji']
 # talk/text <@user>
-mention_cols = ['client_msg_id','talk_user','mention_user']
+mention_cols = ['client_msg_id', 'ts','talk_user','mention_user']
 
 for channel in channels:
     # 日付ごとのjsonファイル一覧を取得
@@ -44,8 +44,20 @@ for channel in channels:
 
         # reaction
         if 'reactions' in df.columns:
-            # name/users/user
-            reactions = df['reactions']
+            df_r = df[df['reactions'] != None]
+            
+            for index, row in df_r.iterrows():
+                talk_user = row['user']
+                df_rs = pd.read_json(row['reactions'])
+                # name/users/user
+                for index, row_rt in df_rs.iterrows():
+                    emoji = row_rt['name']
+                    df_ru = pd.read_json(row_rt['users'])
+                    for index, row_u in df_ru.iterrows():
+                        user = row_u['user']
+
+                # name/users/user
+                reactions = df['reactions']
             
         
         
