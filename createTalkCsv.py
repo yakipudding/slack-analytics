@@ -6,105 +6,97 @@ import json
 import glob
 import csv
 import re
-channels = pd.read_csv('output/channels.csv', encoding='utf_8_sig')
+import uuid
 
-talk_cols = ['channel_id', 'client_msg_id', 'ts', 'thread_ts', 'user', 'text', 'date']
-talk_cols_norequire = ['subtype', 'client_msg_id', 'thread_ts', 'reactions']
-# talk/reactions/users
-reaction_cols = ['channel_id', 'client_msg_id', 'ts', 'talk_user', 'reaction_user', 'emoji']
-# talk/text <@user>
-mention_cols = ['channel_id', 'client_msg_id', 'ts', 'talk_user', 'mention_user']
+class CreateTalkCsv:
+    def outputCsv(self, filename, header, contents):
+        write_encoding = 'utf_8_sig' #excelとかで見るからbom付ける
+        with open(filename + '.csv', 'w', encoding=write_encoding) as f:
+            writer = csv.writer(f, lineterminator='\n')
+            writer.writerow(header)
+            writer.writerows(contents)
 
-# 初期化
-talk_reactions_all = []
-talk_mentions_all = []
-df_talk_all = pd.DataFrame(index=[], columns=talk_cols)
-df_reaction_all = pd.DataFrame(index=[], columns=reaction_cols)
-df_mention_all = pd.DataFrame(index=[], columns=mention_cols)
+    def exec(self):
+        # 列定義
+        talk_cols = ['channel_id', 'talk_id', 'ts', 'thread_ts', 'talk_user', 'text', 'date']
+        talk_norequire_cols = ['subtype', 'thread_ts', 'reactions']
+        reaction_cols = ['channel_id', 'talk_id', 'talk_user', 'reaction_user', 'emoji', 'date']
+        mention_cols = ['channel_id', 'talk_id', 'talk_user', 'mention_user', 'date']
 
-for index, channel in channels.iterrows():
-    channel_id = channel['id']
-    channel_name = channel['name']
+        # 初期化
+        talks_all = []
+        talk_reactions_all = []
+        talk_mentions_all = []
 
-    # 日付ごとのjsonファイル一覧を取得
-    datefiles = glob.glob('data/' + channel_name + '/*.json')
+        df_channels = pd.read_csv('output/channels.csv', encoding='utf_8_sig')
+        # アーカイブ済は除外
+        df_channels = df_channels[df_channels['is_archived'] == False ]
 
-    # 初期化
-    talk_reactions = []
-    talk_mentions = []
-    df_talk = pd.DataFrame(index=[], columns=talk_cols)
-    df_reaction = pd.DataFrame(index=[], columns=reaction_cols)
-    df_mention = pd.DataFrame(index=[], columns=mention_cols)
+        for index, channel in df_channels.iterrows():
+            channel_id = channel['id']
+            channel_name = channel['name']
 
-    for datefile in datefiles:
-        # 日付ファイル取得 + 欠損値補完
-        df = pd.read_json(datefile, encoding='utf-8').fillna("")
-        
-        # channel_id追加
-        df['channel_id'] = channel_id
+            # チャンネルフォルダ内の日別jsonファイル一覧を取得
+            datefiles = glob.glob('data/' + channel_name + '/*.json')
 
-        # 日付列追加
-        date = os.path.splitext(os.path.basename(datefile))[0]
-        df['date'] = date
+            # 初期化
+            talks = []
+            talk_reactions = []
+            talk_mentions = []
 
-        # 要素がない場合は追加
-        for col in talk_cols_norequire: 
-            if not col in df.columns:
-                df[col] = ""
+            # 日付ファイル別ループ
+            for datefile in datefiles:
+                # 日付ファイル取得 + 欠損値補完
+                df = pd.read_json(datefile, encoding='utf-8').fillna("")
 
-        # チャンネル参加を削除
-        df = df[df['subtype'] != 'channel_join']
+                # 日付
+                date = os.path.splitext(os.path.basename(datefile))[0]
 
-        # talk
-        df_talk = pd.concat([df_talk,df[talk_cols]], ignore_index=True)
+                # 要素がない場合は追加
+                for col in talk_norequire_cols: 
+                    if not col in df.columns:
+                        df[col] = ""
 
-        # 1行ずつ
-        for index, row in df.iterrows():
-            talk_user = row['user']
-            client_msg_id = row['client_msg_id']
-            ts = row['ts']
+                # メッセージのみ
+                df = df[df['subtype'] == ""]
 
-            # reaction
-            if row['reactions'] is not "":
-                reactions = row['reactions']
-                # name/users/user
-                for reaction in reactions:
-                    emoji = reaction['name']
-                    users = reaction['users']
-                    for user in users:
-                        talk_reaction = [ channel_id, client_msg_id, ts, talk_user ,user ,emoji ]
-                        talk_reactions.append(talk_reaction)
-                        talk_reactions_all.append(talk_reaction)
-        
-            # mention
-            mentions = re.findall('<@[0-9a-zA-Z_./?-]{9}>', row['text'])
-            for mention in mentions:
-                mention_user = mention[2:-1]
-                talk_mention = [channel_id, client_msg_id, ts, talk_user, mention_user]
-                talk_mentions.append(talk_mention)
-                talk_mentions_all.append(talk_mention)
+                # 1行ずつ
+                for index, row in df.iterrows():
+                    talk_id = str(uuid.uuid4()) 
+                    talk_user = row['user']
 
-    df_talk_all = pd.concat([df_talk_all,df_talk], ignore_index=True)
+                    # talk
+                    talk = [channel_id, talk_id, row['ts'], row['thread_ts'], talk_user, row['text'], date]
+                    talks.append(talk)
+                    talks_all.append(talk)
 
-    df_talk.to_csv('output/channel/' + channel_name +'.csv', encoding='utf_8_sig')
-    with open('output/channel/' + channel_name +'_reaction.csv', 'w', encoding='utf_8_sig') as f:
-        writer = csv.writer(f, lineterminator='\n')
-        writer.writerow(reaction_cols)
-        writer.writerows(talk_reactions)
+                    # reaction
+                    if row['reactions'] is not "":
+                        reactions = row['reactions']
+                        # name/users/user
+                        for reaction in reactions:
+                            emoji = reaction['name']
+                            reaction_users = reaction['users']
+                            for reaction_user in reaction_users:
+                                talk_reaction = [ channel_id, talk_id, talk_user, reaction_user, emoji, date ]
+                                talk_reactions.append(talk_reaction)
+                                talk_reactions_all.append(talk_reaction)
+                
+                    # mention
+                    mentions = re.findall('<@[0-9a-zA-Z_./?-]{9}>', row['text'])
+                    for mention in mentions:
+                        mention_user = mention[2:-1]
+                        talk_mention = [channel_id, talk_id, talk_user, mention_user, date]
+                        talk_mentions.append(talk_mention)
+                        talk_mentions_all.append(talk_mention)
 
-    with open('output/channel/' + channel_name +'_mention.csv', 'w', encoding='utf_8_sig') as f:
-        writer = csv.writer(f, lineterminator='\n')
-        writer.writerow(mention_cols)
-        writer.writerows(talk_mentions)
+            self.outputCsv('output/channel/' + channel_name +'_talk', talk_cols, talks)
+            self.outputCsv('output/channel/' + channel_name +'_reaction', reaction_cols, talk_reactions)
+            self.outputCsv('output/channel/' + channel_name +'_mention', mention_cols, talk_mentions)
 
+        self.outputCsv('output/talk', talk_cols, talks_all)
+        self.outputCsv('output/reaction', reaction_cols, talk_reactions_all)
+        self.outputCsv('output/mention', mention_cols, talk_mentions_all)
 
-df_talk_all.to_csv('output/talk_all.csv', encoding='utf_8_sig')
-with open('output/talk_reaction_all.csv', 'w', encoding='utf_8_sig') as f:
-    writer = csv.writer(f, lineterminator='\n')
-    writer.writerow(reaction_cols)
-    writer.writerows(talk_reactions_all)
-
-with open('output/talk_mention_all.csv', 'w', encoding='utf_8_sig') as f:
-    writer = csv.writer(f, lineterminator='\n')
-    writer.writerow(mention_cols)
-    writer.writerows(talk_mentions_all)
+createTalkCsv = CreateTalkCsv()
+createTalkCsv.exec()
