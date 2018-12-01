@@ -1,40 +1,40 @@
 # slack-analytics
 
-## ŠÂ‹«
+## ç’°å¢ƒ
+- Windows
 - Python3.X
-- pandas
 
-## g‚¢•û
-1. Slack‚©‚çƒƒO‚ğƒ_ƒEƒ“ƒ[ƒh‚·‚éiİ’è‚ÆŒ ŒÀ„ƒf[ƒ^‚ÌƒCƒ“ƒ|[ƒg^ƒGƒNƒXƒ|[ƒgj
-2. dataƒtƒHƒ‹ƒ_‚ğì¬‚µA1‚ğ‰ğ“€‚µ‚½‚à‚Ì‚ğ’u‚­
-3. createMasterCsv.py‚ğÀs
-4. createTalkCsv.py‚ğÀs
+## ãƒ­ã‚°åŠ å·¥ã€€ä½¿ã„æ–¹
+1. Slackã‹ã‚‰ãƒ­ã‚°ã‚’ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ï¼ˆè¨­å®šã¨æ¨©é™ï¼ãƒ‡ãƒ¼ã‚¿ã®ã‚¤ãƒ³ãƒãƒ¼ãƒˆï¼ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆï¼‰
+2. dataãƒ•ã‚©ãƒ«ãƒ€ã‚’ä½œæˆã—ã€1ã‚’è§£å‡ã—ãŸã‚‚ã®ã‚’ç½®ã
+3. createMasterCsv.pyã‚’å®Ÿè¡Œ
+4. createTalkCsv.pyã‚’å®Ÿè¡Œ
 
 ## createMasterCsv.py
-channels.jsonAusers.json‚©‚çcsvì¬
+channels.jsonã€users.jsonã‹ã‚‰csvä½œæˆ
 - output
 	- channels.csv
 	- users.csv
 
 ## createTalkCsv.py
-ƒ`ƒƒƒ“ƒlƒ‹‚²‚Æ“ú•t‚²‚Æ‚ÌƒƒO‚©‚çƒƒbƒZ[ƒWAƒŠƒAƒNƒVƒ‡ƒ“Aƒƒ“ƒVƒ‡ƒ“csv‚ğì¬
+ãƒãƒ£ãƒ³ãƒãƒ«ã”ã¨æ—¥ä»˜ã”ã¨ã®ãƒ­ã‚°ã‹ã‚‰ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã€ãƒªã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã€ãƒ¡ãƒ³ã‚·ãƒ§ãƒ³csvã‚’ä½œæˆ
 - output
 	- talk.csv
 	- reaction.csv
 	- mention.csv
-	- ƒ`ƒƒƒ“ƒlƒ‹–¼ƒfƒBƒŒƒNƒgƒŠ
+	- ãƒãƒ£ãƒ³ãƒãƒ«åãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
 		- talk.csv
 		- reaction.csv
 		- mention.csv
 
-### ƒƒbƒZ[ƒW
+### ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 |channel_id|talk_id|talk_user|text|
 |:--|:--|:--|:--|
-|C5XXXXXXX|XX1|U9XXXXXXX|`<@U8YYYYYYY>`‚±‚ñ‚É‚¿‚Í|
-|C5XXXXXXX|XX2|U8YYYYYYY|‹A‚è‚½‚¢|
-|C5XXXXXXX|XX3|U9XXXXXXX|‚µ‚²‚¨‚í|
+|C5XXXXXXX|XX1|U9XXXXXXX|`<@U8YYYYYYY>`ã“ã‚“ã«ã¡ã¯|
+|C5XXXXXXX|XX2|U8YYYYYYY|å¸°ã‚ŠãŸã„|
+|C5XXXXXXX|XX3|U9XXXXXXX|ã—ã”ãŠã‚|
 
-### ƒŠƒAƒNƒVƒ‡ƒ“
+### ãƒªã‚¢ã‚¯ã‚·ãƒ§ãƒ³
 |channel_id|talk_id|talk_user|reaction_user|emoji|
 |:--|:--|:--|:--|:--|
 |C5XXXXXXX|XX1|U9XXXXXXX|U8YYYYYYY|ok_woman|
@@ -42,8 +42,14 @@ channels.jsonAusers.json‚©‚çcsvì¬
 |C5XXXXXXX|XX2|U8YYYYYYY|U9XXXXXXX|wakaru|
 |C5XXXXXXX|XX2|U9XXXXXXX|U7ZZZZZZZ|otukare|
 
-### ƒƒ“ƒVƒ‡ƒ“
+### ãƒ¡ãƒ³ã‚·ãƒ§ãƒ³
 |channel_id|talk_id|talk_user|mention_user|
 |:--|:--|:--|:--|
 |C5XXXXXXX|XX1|U9XXXXXXX|U8YYYYYYY|
 
+## ã‚°ãƒ©ãƒ•ä½œæˆã€€ä½¿ã„æ–¹
+
+### drawNetworkGraph.py
+- Jupyter Notebookã«ãƒ¡ãƒ³ã‚·ãƒ§ãƒ³é–¢ä¿‚ã®ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯å›³ã‚’å‡ºåŠ›ã—ã¾ã™
+- ç™ºè¨€Top50ã«é™å®šã—ã¦ã„ã‚‹ã®ã§ãƒãƒ£ãƒ³ãƒãƒ«å†…ã§åˆ†æã™ã‚‹ã®ã‚’ãŠå‹§ã‚ã—ã¾ã™
+- ãƒ­ã‚°åŠ å·¥ã‚’å…ˆã«å®Ÿè¡Œã—ã¦ãŠãã“ã¨
