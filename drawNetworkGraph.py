@@ -2,7 +2,6 @@
 # createTalkCsvを先に実行していること
 
 #%%
-import json
 import collections
 import networkx as nx
 import pandas as pd
