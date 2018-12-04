@@ -15,12 +15,12 @@ df_users = pd.read_csv('output/users.csv', encoding='utf_8_sig', index_col=3) #i
 # ネットワーク図の作成
 ## ノードの生成：発言数で円を大きくする
 G = nx.Graph()
-G.add_nodes_from([(df_users.at[user,'profile_display_name_normalized'], {"count":count}) for user, count in talks_count])
+G.add_nodes_from([(df_users.at[user,'display_name_custom'], {"count":count}) for user, count in talks_count])
 
 ## エッジの追加：メンション関係でエッジを追加する
 for index, mention in df_mentions.iterrows():
-    talk_user = df_users.at[mention['talk_user'],'profile_display_name_normalized']
-    mention_user = df_users.at[mention['mention_user'],'profile_display_name_normalized']
+    talk_user = df_users.at[mention['talk_user'],'display_name_custom']
+    mention_user = df_users.at[mention['mention_user'],'display_name_custom']
     if not G.has_node(talk_user) or not G.has_node(mention_user):
         continue
     if G.has_edge(talk_user, mention_user):
