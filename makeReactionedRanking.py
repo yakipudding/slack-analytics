@@ -3,21 +3,24 @@
 import pandas as pd
 import csv
 import collections
+import commonTools
 
 ranking = []
 ranking_cols = ['channel_name', 'user_name', 'talk_text', 'count', 'reaction']
+target_emoji_list = ['+1', 'thumbsup_all', 'iine', 'clap', 'sasuga', 'suteki']
 
 df_channels = pd.read_csv('output/channels.csv', encoding='utf_8_sig', index_col=3) #index:channel_id
 df_users = pd.read_csv('output/users.csv', encoding='utf_8_sig', index_col=3) #index:user_id
 df_talks = pd.read_csv('output/talk.csv', encoding='utf_8_sig', index_col=1) #index:talk_id
 df_reaction = pd.read_csv('output/reaction.csv', encoding='utf_8_sig')
+df_reaction = df_reaction[df_reaction['emoji'].isin(target_emoji_list)]
 reaction_count = collections.Counter(df_reaction['talk_id']).most_common(50)
 
 for (talk_id, count) in reaction_count:
     talk = df_talks.loc[talk_id]
     channel_name = df_channels.at[talk['channel_id'],'name']
     user_name = df_users.at[talk['talk_user'],'profile_display_name_normalized']
-    talk_text = talk['text']
+    talk_text = commonTools.CommonTools().convertTalkText(talk['text'], df_users)
 
     reactions = df_reaction[df_reaction['talk_id'] == talk_id]
     reactions_count = collections.Counter(reactions['emoji']).most_common()
